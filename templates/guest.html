@@ -1,0 +1,29 @@
+<%inherit file="/base.html"/>
+
+<style>
+    .comment {
+        width: 250px;
+        height: 80px;
+    }
+</style>
+
+<a href="/guest_list">Back to Guest List</a>
+
+% if guest:
+    <h2>${guest.name}</h2>
+    <form action="/rsvp" method="POST">
+        <p class="attending">
+            % if guest.attending:
+                &#10003; This guest IS attending
+            % else:
+                &#216; This guest IS NOT attending
+            % endif
+        </p>
+        <textarea class="comment" name="comment">${guest.comment}</textarea>
+        <br><br>
+        <input type="hidden" value="${guest.id}" name="gid"/>
+        <input type="submit" value="${COMING}" name="attending"/>
+        <input type="submit" value="${NOT_COMING}" name="attending"/>
+    </form>
+
+% endif

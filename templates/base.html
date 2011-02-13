@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>${self.page_title()}</title>
+</head>
+<style>
+    body {
+        background: #cccccc; color: #c81ad3; padding: 10px;
+    }
+</style>
+<body>
+    <div id="flashbox">
+        % for type in ('info','warning','error'):
+            % for info in session.get(type,[]):
+                <div class="${type}">${info}</div>
+            % endfor
+            <% session[type] = [] %>
+        % endfor
+    </div>
+</body>
+
+<%def name="page_title()">
+    MostSplendiferous
+</%def>
+
+
+${self.body()}
