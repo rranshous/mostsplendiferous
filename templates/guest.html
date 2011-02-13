@@ -19,11 +19,15 @@
                 &#216; This guest IS NOT attending
             % endif
         </p>
-        <textarea class="comment" name="comment">${guest.comment}</textarea>
-        <br><br>
         <input type="hidden" value="${guest.id}" name="gid"/>
-        <input type="submit" value="${COMING}" name="attending"/>
-        <input type="submit" value="${NOT_COMING}" name="attending"/>
+        % if editable:
+            <textarea class="comment" name="comment">${guest.comment}</textarea>
+            <br><br>
+            <input type="submit" value="${COMING}" name="attending"/>
+            <input type="submit" value="${NOT_COMING}" name="attending"/>
+        % else:
+            <p class="comment">${guest.comment}</p>
+        % endif
     </form>
 
 % endif

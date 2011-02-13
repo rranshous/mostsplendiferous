@@ -14,6 +14,8 @@ def render(path,**kwargs):
     cherrypy.log('request: %s' % cherrypy.request)
     kwargs.update({'session':cherrypy.session,
                    'request':cherrypy.request,
+                   'current_guest':cherrypy.session.get('guest'),
+                   'token':cherrypy.session.get('token'),
                    'h':h})
     s = template.render_unicode(**kwargs)
     return s

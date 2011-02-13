@@ -5,10 +5,9 @@
         list-style-type: none;
     }
     .guest {
-
+        margin: 2px 0;
     }
     .guest .name {
-        
     }
     .guest .attending {
         padding-left: 10px;
@@ -19,9 +18,12 @@
         font-size: .9em;
         text-align: right;
     }
+    .guest.current {
+        font-weight: bold;
+    }
 </style>
 
-<a href="/">Back to Home Page</a>
+<a href="/${token}">Back to Home Page</a>
 
 <div class="side">
     <p>To update your RSVP status find your name in the list and click it. It will allow you to update your status as well as add any comments you may have.</p>
@@ -34,14 +36,16 @@
 
 <ul class="guest_list">
 % for guest in guests:
-    <li class="guest">
-        % if guest.attending:
+    <li class="guest ${'current' if h.is_guest(guest) else ''}">
+        % if not guest.rsvpd:
+            <span style="visibility: hidden;">&#216;</span>
+        % elif guest.attending:
             &#10003;
         % else:
             &#216;
         % endif
         &nbsp;
-        <a href="/guest?gid=${guest.id}"/>
+        <a href="/guest/${guest.id}/"/>
             <span class="name">${guest.name or 'UNKNOWN'}</span></a>
         <span class="attending">
         </span>
