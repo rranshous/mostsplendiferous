@@ -28,13 +28,15 @@ def get_token():
 
 def get_guest():
     guest = cherrypy.session.get('guest')
-    print 'get_guest: %s' % guest
     return guest
 
 def init_token(token,guest=None):
-    print 'init_token: %s' % token
     cherrypy.session['token'] = token
+    guest = guest or get_guest_from_token(token)
     cherrypy.session['guest'] = guest
+
+def is_admin():
+    return get_token() == ADMIN_TOKEN
 
 def is_guest(guest):
     if get_token() == ADMIN_TOKEN:
@@ -47,6 +49,15 @@ def is_guest(guest):
         return True
     return False
 
+def get_guest_from_token(token):
+    guest_tokens = []
+    for guest in m.Guest.query.all():
+        guest_tokens.append((guest,get_guest_token(guest)))
+    guest_tokens.append((None,ADMIN_TOKEN))
+    for guest,guest_token in guest_tokens:
+        if guest_token == token:
+            return guest
+    return None
 
 #@decorator
 def grab_token(f): #,*args,**kwargs):

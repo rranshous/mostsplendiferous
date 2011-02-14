@@ -13,21 +13,104 @@
     <h2>${guest.name}</h2>
     <form action="/rsvp" method="POST">
         <p class="attending">
-            % if guest.attending:
+            % if guest.rsvpd is False:
+                This guest has not RSVPd
+            % elif guest.attending and not editable:
                 &#10003; This guest IS attending
-            % else:
+            % elif guest.attending and editable:
+                &#10003; You ARE attending
+            % elif not guest.attending and not editable:
                 &#216; This guest IS NOT attending
+            % elif not guest.attending and editable:
+                &#216; You are ARE NOT attending
             % endif
         </p>
         <input type="hidden" value="${guest.id}" name="gid"/>
+
         % if editable:
-            <textarea class="comment" name="comment">${guest.comment}</textarea>
+
+            ## GUEST COUNT
+            % if guest.guests_allowed:
+                <label for="guests_coming">Guests Attending</label>
+                <select name="guests_coming" id="guests_coming">
+                    % for i in xrange(guest.guests_allowed+1):
+                        <option value="${i}"
+                            % if i == guest.guests_coming:
+                                selected="selected"
+                            % endif
+                        >
+                        ${i}
+                        </option>
+                    % endfor
+                </select>
+            % endif
+
+
+            ## GUESTS REQUESTED
+            % if guest.guests_requested:
+                <p>You currently have a request for
+                    ${guest.guests_requested} more guests
+                </p>
+            % else:
+                <p>
+                    <label for="guests_requested">
+                        Additional Guests Requested?
+                    </label>
+                    <select name="guests_requested" id="guests_requested">
+                        % for i in xrange(3):
+                            <option value="${i}">${i}</option>
+                        % endfor
+                    </select>
+                </p>
+            % endif
+
+            ## GUESTS ALLOWED
+            % if h.is_admin():
+                <p>
+                    <label for="guests_allowed">
+                        Guests Allowed
+                    </label>
+                    <select name="guests_allowed" id="guests_allowed">
+                        % for i in xrange(guest.guests_requested \
+                                         +guest.guests_allowed \
+                                         +1):
+                            <option value="${i}"
+                            % if i == guest.guests_allowed:
+                                selected="selected"
+                            % endif
+                            >${i}</option>
+                        % endfor
+                    </select>
+
+                </p>
+            % endif
+
+            <textarea class="comment" name="comment">
+                ${guest.comment}
+            </textarea>
             <br><br>
+            % if h.is_admin():
+                <input type="submit" value="${NO_RSVP_CHANGE}"
+                       name="attending"/>
+                <input type="submit" value="${UNRSVP}" name="attending"/>
+                <br/>
+                <br/>
+            % endif
             <input type="submit" value="${COMING}" name="attending"/>
             <input type="submit" value="${NOT_COMING}" name="attending"/>
         % else:
             <p class="comment">${guest.comment}</p>
         % endif
+
+        % if h.is_admin():
+            <p>
+                <a href="/guest/${guest.id}/${h.get_guest_token(guest)}">
+                    Authenticated link for this guest
+                </a>
+            </p>
+        % endif
+        
+
     </form>
 
 % endif

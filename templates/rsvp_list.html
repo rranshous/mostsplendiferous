@@ -23,7 +23,7 @@
     }
 </style>
 
-<a href="/${token}">Back to Home Page</a>
+<a href="/">Back to Home Page</a>
 
 <div class="side">
     <p>To update your RSVP status find your name in the list and click it. It will allow you to update your status as well as add any comments you may have.</p>
@@ -52,3 +52,14 @@
     </li>
 % endfor
 </ul>
+
+% if h.is_admin():
+    <div class="admin">
+        <form action="/add_guest" method="POST">
+            <label for="guest_name">Add Guest: </label>
+            <input type="text" id="guest_name" name="name"/>
+            <input type="submit" value="Add"/>
+        </form>
+    </div>
+% endif
+

@@ -29,5 +29,8 @@ BaseEntity = Entity
 class Guest(BaseEntity):
     name = Field(Unicode)
     rsvpd = Field(Boolean,default=False)
-    attending = Field(Boolean,default=False)
+    attending = Field(Boolean,default=None)
     comment = Field(UnicodeText,default='')
+    guests_allowed = Field(Integer,default=0)
+    guests_requested = Field(Integer,default=0)
+    guests_coming = Field(Integer,default=0)
