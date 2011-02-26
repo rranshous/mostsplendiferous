@@ -59,8 +59,9 @@ def get_guest_from_token(token):
             return guest
     return None
 
-#@decorator
-def grab_token(f): #,*args,**kwargs):
+from functools import wraps
+def grab_token(f):
+    @wraps(f)
     def gt(*args,**kwargs):
         # we are going to inspect the first
         # and last args as well as kwargs for tokens
