@@ -46,8 +46,15 @@
         % endif
         &nbsp;
         <a href="/guest/${guest.id}/"/>
-            <span class="name">${guest.name or 'UNKNOWN'}</span></a>
+            <span class="name">${guest.name or 'UNKNOWN'}</span>
+        </a>
         <span class="attending">
+            % if guest.attending:
+                ${guest.party_size}
+                % if guest.guests_coming:
+                    (+${guest.guests_coming})
+                % endif
+            % endif
         </span>
     </li>
 % endfor

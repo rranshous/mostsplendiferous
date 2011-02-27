@@ -31,6 +31,8 @@ class Guest(BaseEntity):
     rsvpd = Field(Boolean,default=False)
     attending = Field(Boolean,default=None)
     comment = Field(UnicodeText,default='')
+    party_size = Field(Integer,default=1)
+
     guests_allowed = Field(Integer,default=0)
     guests_requested = Field(Integer,default=0)
     guests_coming = Field(Integer,default=0)

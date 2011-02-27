@@ -64,8 +64,23 @@
                 </p>
             % endif
 
+            ## PARTY SIZE
             ## GUESTS ALLOWED
             % if h.is_admin():
+                <p>
+                    <label for="party_size">
+                        Party Size
+                    </label>
+                    <select name="party_size" id="party_size">
+                        % for i in xrange(8):
+                            <option value="${i}"
+                            % if i == guest.party_size:
+                                selected="selected"
+                            % endif
+                            >${i}</option>
+                        % endfor
+                    </select>
+                </p>
                 <p>
                     <label for="guests_allowed">
                         Guests Allowed
@@ -81,7 +96,6 @@
                             >${i}</option>
                         % endfor
                     </select>
-
                 </p>
             % endif
 

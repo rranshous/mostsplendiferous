@@ -55,13 +55,20 @@ class Root(BaseController):
     def guest_list_report(self):
         guests = m.Guest.query.order_by(m.Guest.name).all()
         csv_data = []
-        header = ['Guest','RSVPd','Attending','Comment']
+        header = ['Guest','Party Size','RSVPd','Attending','Comment',
+                  'Guests Requested', 'Guests Allowed',
+                  'Guests Attending','Total']
         for guest in guests:
             d = []
             d.append(guest.name)
+            d.append(guest.party_size)
             d.append('1' if guest.rsvpd else '0')
             d.append('1' if guest.attending else '0')
             d.append(guest.comment or '')
+            d.append(guest.guests_requested)
+            d.append(guest.guests_allowed)
+            d.append(guest.guests_coming)
+            d.append(guest.party_size + guest.guests_coming)
             csv_data.append(d)
         csv_buffer = StringIO.StringIO()
         csv_report = csv.writer(csv_buffer)
@@ -75,7 +82,7 @@ class Root(BaseController):
 
     @cherrypy.expose
     @grab_token
-    def rsvp(self,gid=None,attending=False,comment='',
+    def rsvp(self,gid=None,attending=False,comment='', party_size=1,
              guests_requested=0, guests_coming=0, guests_allowed=0):
         try:
             guest = m.Guest.get(gid)
@@ -87,6 +94,7 @@ class Root(BaseController):
             guests_requested = int(guests_requested)
             guests_coming = int(guests_coming)
             guests_allowed = int(guests_allowed)
+            party_size = int(party_size)
 
             if attending == COMING:
                 guest.attending = True
@@ -102,25 +110,32 @@ class Root(BaseController):
             comment = comment.strip()
             guest.comment = comment
 
-            if guest.guests_requested != guests_requested:
-                guest.guests_requested += guests_requested
+            # if they are not coming clear guest's coming
+            if not guest.attending:
+                guest.guests_coming = 0
 
-            if guests_coming != guest.guests_coming:
-                guest.guests_coming = guests_coming
+            else:
+                if guest.guests_requested != guests_requested:
+                    guest.guests_requested += guests_requested
 
-            if is_admin() and guests_allowed != guest.guests_allowed:
-                if guests_allowed < guest.guests_coming:
-                    guest_diff = guests_allowed - guest.guests_coming
-                    guest.guests_requested += abs(guest_diff)
-                    guest.guests_attending = guests_allowed
+                if guests_coming != guest.guests_coming:
+                    guest.guests_coming = guests_coming
 
-                wanted = guest.guests_requested + guest.guests_coming
-                if guests_allowed >= wanted:
-                    guest.guests_requested = 0
+                if party_size != guest.party_size:
+                    guest.party_size = party_size
 
-                guest.guests_allowed = guests_allowed
+                if is_admin() and guests_allowed != guest.guests_allowed:
+                    if guests_allowed < guest.guests_coming:
+                        guest_diff = guests_allowed - guest.guests_coming
+                        guest.guests_requested += abs(guest_diff)
+                        guest.guests_coming = guests_allowed
 
-            not_ = 'not' if not guest.attending else ''
+                    wanted = guest.guests_requested + guest.guests_coming
+                    if guests_allowed >= wanted:
+                        guest.guests_requested = 0
+
+                    guest.guests_allowed = guests_allowed
+
             m.session.commit()
 
             return redirect('/guest',guest.id)
