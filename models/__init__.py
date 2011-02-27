@@ -17,7 +17,7 @@ def reset_session():
     return
 
 def setup():
-    metadata.bind = "sqlite:///./dbs/dev.db"
+    metadata.bind = "sqlite:////home/robby/coding/mostsplendiferous/dbs/dev.db"
     metadata.bind.echo = False
     setup_all()
 
