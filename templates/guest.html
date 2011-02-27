@@ -13,8 +13,10 @@
     <h2>${guest.name}</h2>
     <form action="/rsvp" method="POST">
         <p class="attending">
-            % if guest.rsvpd is False:
+            % if guest.rsvpd is False and not editable:
                 This guest has not RSVPd
+            % elif guest.rsvpd is False:
+                You have not RSVPd
             % elif guest.attending and not editable:
                 &#10003; This guest IS attending
             % elif guest.attending and editable:
@@ -86,9 +88,9 @@
                         Guests Allowed
                     </label>
                     <select name="guests_allowed" id="guests_allowed">
-                        % for i in xrange(guest.guests_requested \
-                                         +guest.guests_allowed \
-                                         +1):
+                        % for i in xrange( guest.guests_requested \
+                                         + guest.guests_allowed \
+                                         + 1):
                             <option value="${i}"
                             % if i == guest.guests_allowed:
                                 selected="selected"
