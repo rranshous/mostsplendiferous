@@ -125,8 +125,17 @@
                 </a>
             </p>
         % endif
-        
 
     </form>
+
+    % if h.is_admin():
+        <form method="POST" action="/send_reminder">
+            <input type="submit" name="action" value="Send Reminder"/>
+            <input type="hidden" name="gid" value="${guest.id}"/>
+            % if guest.email_sent:
+                They have already been emailed
+            % endif
+        </form>
+    % endif
 
 % endif

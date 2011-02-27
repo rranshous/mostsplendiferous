@@ -31,6 +31,10 @@ class Guest(BaseEntity):
     rsvpd = Field(Boolean,default=False)
     attending = Field(Boolean,default=None)
     comment = Field(UnicodeText,default='')
+
+    email_sent = Field(Boolean,default=False)
+    email_address = Field(Unicode,default='')
+
     party_size = Field(Integer,default=1)
 
     guests_allowed = Field(Integer,default=0)

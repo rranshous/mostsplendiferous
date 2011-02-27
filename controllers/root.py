@@ -5,11 +5,19 @@ import csv
 import StringIO
 from cherrypy.lib import file_generator
 from decorator import decorator
+from maillib import Mail
 
 NOT_COMING = 'I AM NOT coming'
 COMING = 'I AM coming'
 UNRSVP = 'UN-RSVPd'
 NO_RSVP_CHANGE = 'NO RSVP change'
+
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_SENDER = '"Lizz Mitchell" <lizzisgettingmarried@gmail.com>'
+MAIL_SENDER = 'lizzisgettingmarried@gmail.com'
+MAIL_TEMPLATE_PATH = './email_template.html'
+MAIL_SUBJECT = 'Robby and Lizz are getting married!'
+LINK_TEMPLATE = 'http://mostsplendiferous.com/guest/%s/%s'
 
 class Root(BaseController):
     """ sits @ The root of the app """
@@ -110,31 +118,26 @@ class Root(BaseController):
             comment = comment.strip()
             guest.comment = comment
 
-            # if they are not coming clear guest's coming
-            if not guest.attending:
-                guest.guests_coming = 0
+            if guest.guests_requested != guests_requested:
+                guest.guests_requested += guests_requested
 
-            else:
-                if guest.guests_requested != guests_requested:
-                    guest.guests_requested += guests_requested
+            if guests_coming != guest.guests_coming:
+                guest.guests_coming = guests_coming
 
-                if guests_coming != guest.guests_coming:
-                    guest.guests_coming = guests_coming
+            if party_size != guest.party_size:
+                guest.party_size = party_size
 
-                if party_size != guest.party_size:
-                    guest.party_size = party_size
+            if is_admin() and guests_allowed != guest.guests_allowed:
+                if guests_allowed < guest.guests_coming:
+                    guest_diff = guests_allowed - guest.guests_coming
+                    guest.guests_requested += abs(guest_diff)
+                    guest.guests_coming = guests_allowed
 
-                if is_admin() and guests_allowed != guest.guests_allowed:
-                    if guests_allowed < guest.guests_coming:
-                        guest_diff = guests_allowed - guest.guests_coming
-                        guest.guests_requested += abs(guest_diff)
-                        guest.guests_coming = guests_allowed
+                wanted = guest.guests_requested + guest.guests_coming
+                if guests_allowed >= wanted:
+                    guest.guests_requested = 0
 
-                    wanted = guest.guests_requested + guest.guests_coming
-                    if guests_allowed >= wanted:
-                        guest.guests_requested = 0
-
-                    guest.guests_allowed = guests_allowed
+                guest.guests_allowed = guests_allowed
 
             m.session.commit()
 
@@ -153,6 +156,62 @@ class Root(BaseController):
     @grab_token
     def reception_details(self):
         return render('/reception_details.html')
+
+
+
+    @cherrypy.expose
+    @grab_token
+    def send_reminder(self,gid=None,action=None):
+        guest = m.Guest.get(gid)
+
+        with file('./smtp_creds.txt','r') as fh:
+            username, password = fh.read().strip().split()
+
+        if not guest:
+            add_flash('Guest Not Found!')
+            return redirect('/guest_list')
+
+        if not guest.email_address:
+            add_flash('No email address')
+            return redirect('/guest',guest.id)
+
+        # must be admin
+        if not is_admin():
+            add_flash('Must be admin')
+            return redirect('/guest',gid)
+
+        try:
+            mail = Mail(
+                server=MAIL_SERVER,
+                username=username,
+                password=password,
+                smtp_port=587,
+                sender=MAIL_SENDER,
+    #            to=guest.email_address,
+                subject=MAIL_SUBJECT,
+                to='rranshous@gmail.com',
+                template_path=MAIL_TEMPLATE_PATH,
+                use_templating=True,
+                type='mako',
+                replacement_dict={
+                    'name':guest.name,
+                    'party_size':guest.party_size,
+                    'guests':guest.guests_coming,
+                    'link': LINK_TEMPLATE % (guest.id,
+                                             get_guest_token(guest))
+                }
+            )
+
+            mail.send()
+            guest.email_sent = True
+            add_flash('email sent to %s' % ', '.join(mail.to))
+            m.session.commit()
+        except Exception, ex:
+            raise
+            add_flash('email failed')
+
+        return redirect('/guest',guest.id)
+
 
     @cherrypy.expose
     def add_guest(self,name=''):
