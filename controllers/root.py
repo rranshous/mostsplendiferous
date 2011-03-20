@@ -13,9 +13,8 @@ UNRSVP = 'UN-RSVPd'
 NO_RSVP_CHANGE = 'NO RSVP change'
 
 MAIL_SERVER = 'smtp.gmail.com'
-MAIL_SENDER = '"Lizz Mitchell" <lizzisgettingmarried@gmail.com>'
 MAIL_SENDER = 'lizzisgettingmarried@gmail.com'
-MAIL_TEMPLATE_PATH = './email_template.html'
+MAIL_TEMPLATE_PATH = '/home/robby/coding/mostsplendiferous/email_template.html'
 MAIL_SUBJECT = 'Robby and Lizz are getting married!'
 LINK_TEMPLATE = 'http://mostsplendiferous.com/guest/%s/%s'
 
@@ -76,7 +75,10 @@ class Root(BaseController):
             d.append(guest.guests_requested)
             d.append(guest.guests_allowed)
             d.append(guest.guests_coming)
-            d.append(guest.party_size + guest.guests_coming)
+            if guest.rsvpd:
+                d.append(guest.party_size + guest.guests_coming)
+            else:
+                d.append(0)
             csv_data.append(d)
         csv_buffer = StringIO.StringIO()
         csv_report = csv.writer(csv_buffer)
@@ -124,7 +126,7 @@ class Root(BaseController):
             if guests_coming != guest.guests_coming:
                 guest.guests_coming = guests_coming
 
-            if party_size != guest.party_size:
+            if is_admin() and party_size != guest.party_size:
                 guest.party_size = party_size
 
             if is_admin() and guests_allowed != guest.guests_allowed:
@@ -164,7 +166,7 @@ class Root(BaseController):
     def send_reminder(self,gid=None,action=None):
         guest = m.Guest.get(gid)
 
-        with file('./smtp_creds.txt','r') as fh:
+        with file('/home/robby/coding/mostsplendiferous/smtp_creds.txt','r') as fh:
             username, password = fh.read().strip().split()
 
         if not guest:
@@ -187,9 +189,8 @@ class Root(BaseController):
                 password=password,
                 smtp_port=587,
                 sender=MAIL_SENDER,
-    #            to=guest.email_address,
+                to=guest.email_address,
                 subject=MAIL_SUBJECT,
-                to='rranshous@gmail.com',
                 template_path=MAIL_TEMPLATE_PATH,
                 use_templating=True,
                 type='mako',

@@ -24,10 +24,14 @@
             % elif not guest.attending and not editable:
                 &#216; This guest IS NOT attending
             % elif not guest.attending and editable:
-                &#216; You are ARE NOT attending
+                &#216; You ARE NOT attending
             % endif
         </p>
         <input type="hidden" value="${guest.id}" name="gid"/>
+
+        <p>
+            Your party size is ${guest.party_size}
+        </p>
 
         % if editable:
 
@@ -101,9 +105,7 @@
                 </p>
             % endif
 
-            <textarea class="comment" name="comment">
-                ${guest.comment}
-            </textarea>
+            <textarea class="comment" name="comment">${guest.comment}</textarea>
             <br><br>
             % if h.is_admin():
                 <input type="submit" value="${NO_RSVP_CHANGE}"
