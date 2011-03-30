@@ -7,8 +7,6 @@
     }
 </style>
 
-<a href="/guest_list">Back to Guest List</a>
-
 % if guest:
     <h2>${guest.name}</h2>
     <form action="/rsvp" method="POST">
@@ -30,7 +28,8 @@
         <input type="hidden" value="${guest.id}" name="gid"/>
 
         <p>
-            Your party size is ${guest.party_size}
+            Your party size is ${guest.party_size}<br>
+            Number of guests attending is ${guest.guests_allowed}
         </p>
 
         % if editable:

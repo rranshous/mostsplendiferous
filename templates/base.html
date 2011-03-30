@@ -1,26 +1,60 @@
 <html>
 <head>
-    <title>${self.page_title()}</title>
-</head>
+<title>${self.page_title()}</title>
 <style>
     body {
-        background: #cccccc; color: #c81ad3; padding: 10px;
+        background: #cccccc; color: #872187; padding: 10px;
     }
+    ul#header {
+     
+      margin: 0;
+      padding: 0;
+     
+    }
+    ul#header li {
+     
+      display: inline;
+      list-style-type: none;
+     
+    }
+     
+    ul#header a {
+     
+      display: block;
+      float: left;
+      padding: 0 1em;
+     
+    }
+
 </style>
+</head>
 <body>
-    <div id="flashbox">
-        % for type in ('info','warning','error'):
-            % for info in session.get(type,[]):
-                <div class="${type}">${info}</div>
-            % endfor
-            <% session[type] = [] %>
+
+
+
+<ul id="header">
+    <li><a href="/" class="front_page">Front Page</a></li>
+    <li><a href="/guest_list" class="rsvp">RSVP for Florida Reception</a></li>
+    <li><a href="/reception_details" class="reception">Florida Reception Details</a></li>
+    % if session.get('guest'):
+    <li><a href="/guest/${h.get_guest().id}" class="guest">Edit your information</a></li>
+    % else:
+        <span style="color:black;">
+            To edit your your RSVP status click the link in your email</span>
+    % endif
+</ul>
+<br>
+<div id="flashbox">
+    % for type in ('info','warning','error'):
+        % for info in session.get(type,[]):
+            <div class="${type}">${info}</div>
         % endfor
-    </div>
-</body>
+        <% session[type] = [] %>
+    % endfor
+</div>
+
+${self.body()}
 
 <%def name="page_title()">
     MostSplendiferous
 </%def>
-
-
-${self.body()}
