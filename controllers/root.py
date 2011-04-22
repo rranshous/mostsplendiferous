@@ -7,6 +7,9 @@ from cherrypy.lib import file_generator
 from decorator import decorator
 from maillib import Mail
 
+# music controller
+from music import Music
+
 NOT_COMING = 'I AM NOT coming'
 COMING = 'I AM coming'
 UNRSVP = 'UN-RSVPd'
@@ -20,6 +23,9 @@ LINK_TEMPLATE = 'http://mostsplendiferous.com/guest/%s/%s'
 
 class Root(BaseController):
     """ sits @ The root of the app """
+
+    # handles music suggestions
+    music = Music()
 
     @cherrypy.expose
     def default(self,token=None):
