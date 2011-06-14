@@ -17,6 +17,7 @@ NO_RSVP_CHANGE = 'NO RSVP change'
 
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_SENDER = 'lizzisgettingmarried@gmail.com'
+MAIL_SENDER = 'rranshous@gmail.com'
 MAIL_TEMPLATE_PATH = '/home/robby/coding/mostsplendiferous/email_template.html'
 MAIL_SUBJECT = 'Robby and Lizz are getting married!'
 LINK_TEMPLATE = 'http://mostsplendiferous.com/guest/%s/%s'
